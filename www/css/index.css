@@ -20,6 +20,7 @@
     border-width: 2px;
     border-color: black;
     display: none;
+    box-shadow: 10px 10px 5px grey;
 }
 
 #forgeViewerBackground {
