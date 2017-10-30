@@ -1,205 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, height=device-height, minimum-scale=1.0, maximum-scale=1.0">
     <title>Forge Model Derivative API sample</title>
-    <link rel="stylesheet" href="/css/jstree.style.min.css"/>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <!--<link rel="stylesheet" href="https://developer-stg.api.autodesk.com/viewingservice/v1/viewers/style.css"-->
+
     <!--type="text/css">-->
     <script language="JavaScript" src="/js/jquery.min.js"></script>
-    <script language="JavaScript" src="/js/jquery.storageapi.min.js"></script>
     <script language="JavaScript" src="/js/scripts.js"></script>
-    <script src="/js/jstree.js"></script>
     <script src="/js/bootstrap.min.js"></script>
 
     <!-- for the viewer -->
-    <script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/three.min.js?v=v2.16"></script>
-    <!-- Last working version was 2.8
-      <script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.js?v=v2.10"></script>
-      <link rel="stylesheet" href="https://developer.api.autodesk.com/viewingservice/v1/viewers/style.min.css?v=v2.10"/>
-    ?v=v2.10 -->
-    <script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.js?v=v2.16"></script>
-    <link rel="stylesheet" href="https://developer.api.autodesk.com/viewingservice/v1/viewers/style.min.css?v=v2.16"/>
+    <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/three.min.js?v=3.2"></script>
+    <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/viewer3D.js?v=3.2"></script>
+    <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/style.min.css?v=3.2" />
 
-    <script language="JavaScript" src="/js/libraries/clipboard.min.js"></script>
-
-    <link rel="stylesheet" href="/css/index.css"/>
+    <link rel="stylesheet" href="/css/index.css" />
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 </head>
+
 <body>
-<div class="container-fluid">
-    <div class="jumbotron">
-        <h3>Model Derivative API - Basic Node.js Sample</h3>
-        <h4>Show the entire list of
-            <span class="glyphicon glyphicon-inbox"></span> Hubs,
-            <span class="glyphicon glyphicon-list-alt"></span> Projects,
-            <span class="glyphicon glyphicon-folder-open"></span> Folders,
-            <span class="glyphicon glyphicon-briefcase"></span> Items and
-            <span class="glyphicon glyphicon-time"></span> Versions under your
-            account.</h4>
-        <h4>Select an item version to show a file using <a href="https://developer.autodesk.com/api/viewerapi/">
-                Autodesk Viewer</a>
-        </h4>
-        <div class="row">
-            <div class="col-sm-3" style="height:40px">
 
-                <a href="#" id="authenticate" class="btn btn-warning btn-block">
-                    <span class="glyphicon glyphicon-user"></span>
-                    Log In
-                </a>
-            </div>
-            <div class="col-sm-3" style="height:40px">
-                <div id="wipVsStorage" class="btn btn-primary active" data-toggle="button" aria-pressed="false" autocomplete="off" style="font-size: 10pt; visibility: hidden;">
-                    <span id="wipVsStorageText">Use WIP (instead of Storage)</span>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-3" style="height:40px">
-                <div id="progressInfo" class="btn btn-info" style="font-size: 10pt ">
-                    <span id="progressInfoText">Progress info</span>
-                    <span id="progressInfoIcon"></span>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-
-        </div>
-        <div class="row" style="background: white">
-            <div class="col-sm-3 forgeTreeContainer">
-                <div id="forgeFiles">
-
-                </div>
-                <div id="forgeUpload" class="forgeControlContainer">
-                    <div style="display: inline-block">
-                        <a id="uploadFile" class="btn btn-warning" disabled>
-                            <span class="glyphicon glyphicon-open-file"></span>
-                            Upload attachment
-                        </a>
-                    </div>
-                    <input type="file" id="forgeUploadHidden" name="file"/>
-                </div>
-            </div>
-            <div class="col-sm-4 forgeTreeContainer" style="position: relative">
-                <div id="forgeHierarchy" class="forgeControl"></div>
-                <div id="forgeFileOptions" class="forgeControlContainer" style="height:50px; overflow: hidden;">
-
-                    <div style="display: inline-block">
-                        <select id="forgeFormats" class="input-small form-control" style="width:90px">
-                        </select>
-                     </div>
-
-                    <div style="display: inline-block">
-                        <a id="downloadExport" class="btn btn-warning">
-                            <span class="glyphicon glyphicon-save-file"></span>
-                            Download
-                        </a>
-                    </div>
-
-                    <div style="display: inline-block">
-                        <a id="deleteManifest" class="btn btn-warning">
-                            <span class="glyphicon glyphicon-trash"></span>
-                            Delete
-                        </a>
-                    </div>
-                </div>
-                <div id="forgeProperties" class="forgeControl"></div>
-            </div>
-
-            <div class="col-sm-5 forgeViewer">
-                <div id="forgeViewer"></div>
+    <!-- Navbar (sit on top) -->
+    <div class="w3-top">
+        <div class="w3-bar w3-white w3-wide w3-padding w3-card">
+            <a href="#home" class="w3-bar-item w3-button">
+                <b>BR</b> Designs</a>
+            <!-- Float links to the right. Hide them on small screens -->
+            <div class="w3-right w3-hide-small">
+                <a href="#projects" class="w3-bar-item w3-button">Projects</a>
+                <a href="#about" class="w3-bar-item w3-button">About</a>
+                <a href="#contact" class="w3-bar-item w3-button">Contact</a>
             </div>
         </div>
     </div>
-</div>
 
-<iframe id="fusionLoader" width="1" height="1" style="visibility:hidden"></iframe>
+    <!-- Header -->
+    <header class="w3-display-container w3-content w3-wide" style="max-width:1500px;" id="home">
+        <img class="w3-image" src="/img/Fusion-360-Hero-rendering-2000x1000.jpg" alt="Architecture" width="1500" height="800">
+        <div class="w3-display-middle w3-margin-top w3-center">
+            <h1 class="w3-xxlarge w3-text-white">
+                <span class="w3-padding w3-black w3-opacity-min"><b>BR</b></span>
+                <span class="w3-hide-small w3-text-dark-grey">Designs</span>
+            </h1>
+        </div>
+    </header>
 
-<!-- Modal Provision BIM360  -->
-<div class="modal fade" id="provisionAccountModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cancel"><span
-                        aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Thanks for using BIM 360 File Sharing!</h4>
-            </div>
-            <div class="modal-body">
-                <p>To view your BIM 360 Docs files on this app please authorize my Forge Client ID with your BIM 360 Docs
-                    Account.</p>
+    <!-- Page content -->
+    <div class="w3-content w3-padding" style="max-width:1564px">
+
+        <!-- Project Section -->
+        <div class="w3-container w3-padding-32" id="projects">
+            <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Projects</h3>
+        </div>
+
+        <div id="content"></div>
+
+        <!-- About Section -->
+        <div class="w3-container w3-padding-32" id="about">
+            <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">About</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+                magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim
+                id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </p>
+        </div>
+
+        <div class="w3-row-padding w3-grayscale">
+            <div class="w3-col l3 m6 w3-margin-bottom">
+                <img src="https://www.w3schools.com/w3images/team2.jpg" alt="John" style="width:100%">
+                <h3>John Doe</h3>
+                <p class="w3-opacity">CEO & Founder</p>
+                <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
                 <p>
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#provisionAccountStepsModal">
-                        Show
-                        me the steps <span class="glyphicon glyphicon-new-window"></span></button>
+                    <button class="w3-button w3-light-grey w3-block">Contact</button>
                 </p>
-                Use this as Forge Client ID:
-                <div class="input-group">
-                    <input type="text" readonly="true" aria-describedby="CopyClientID" id="ClientID" class="form-control"
-                           value=""/>
-                    <span class="input-group-addon" style="cursor: pointer" data-clipboard-target="#ClientID" id="CopyClientID">Copy to clipboard</span>
-                </div>
-                And this App Name:
-                <div class="input-group">
-                    <input type="text" readonly="true" aria-describedby="CopyAppName" id="AppName" class="form-control"
-                           value="BIM 360 File Sharing"/>
-                    <span class="input-group-addon" style="cursor: pointer" data-clipboard-target="#AppName" id="CopyAppName">Copy to clipboard</span>
-                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="provisionAccountSave">Done</button>
+            <div class="w3-col l3 m6 w3-margin-bottom">
+                <img src="https://www.w3schools.com/w3images/team1.jpg" alt="Jane" style="width:100%">
+                <h3>Jane Doe</h3>
+                <p class="w3-opacity">Designer</p>
+                <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+                <p>
+                    <button class="w3-button w3-light-grey w3-block">Contact</button>
+                </p>
             </div>
-        </div>
-    </div>
-</div>
-<!-- Modal Provision BIM360 Help  -->
-<div class="modal fade" id="provisionAccountStepsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cancel"><span
-                        aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel1">Step-by-step guide</h4>
+            <div class="w3-col l3 m6 w3-margin-bottom">
+                <img src="https://www.w3schools.com/w3images/team3.jpg" alt="Mike" style="width:100%">
+                <h3>Mike Ross</h3>
+                <p class="w3-opacity">Designer</p>
+                <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+                <p>
+                    <button class="w3-button w3-light-grey w3-block">Contact</button>
+                </p>
             </div>
-            <div class="modal-body">
-                <p>To access your BIM 360 Docs files with this app, you need to connect your BIM 360 account with the app.</p>
-                <ol>
-                    <li>Log in to <a href="https://bim360enterprise.autodesk.com/" target="_blank">BIM 360 Account
-                        Administration</a>. Note that you need account administrator permissions.
-                    </li>
-                    <li>If you have more than one account, select the account you want to integrate with the app.</li>
-                    <li>From the toolbar, select <strong>SETTINGS &gt; Apps &amp; Integrations</strong>.<br/>
-                        <img src="/img/provisioning/Step1.png" width="500"/></li>
-                    <li>Click the <strong>Add Integration</strong> button.<br/>
-                        <img src="/img/provisioning/Step2.png"/>
-                    </li>
-                    <li>Select <strong>BIM 360 Account Administration</strong> and <strong>BIM 360 Docs</strong>, and click
-                        <strong>Next</strong>.
-                    </li>
-                    <li>Select <strong>I’m the developer</strong>, and click <strong>Next</strong>.</li>
-                    <li>In the <strong>Forge Client ID</strong> and <strong>App Name</strong> fields, enter the Forge client ID
-                        and app name provided by the app retailer.
-                    </li>
-                    <li>Select the <strong>I have saved the Account ID information securely</strong> checkbox.</li>
-                    <li>Click <strong>Save</strong>.</br>
-                        <img src="/img/provisioning/Step3.png" width="500"/>
-                    </li>
-                    <p></p>
-                    <p>Congratulations! You can now access your BIM 360 Docs files.</p>
-                </ol>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Understood, thanks!</button>
+            <div class="w3-col l3 m6 w3-margin-bottom">
+                <img src="https://www.w3schools.com/w3images/team4.jpg" alt="Dan" style="width:100%">
+                <h3>Dan Star</h3>
+                <p class="w3-opacity">Mechanical Engineer</p>
+                <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p>
+                <p>
+                    <button class="w3-button w3-light-grey w3-block">Contact</button>
+                </p>
             </div>
         </div>
-    </div>
-</div>
-<script>
-    new Clipboard('.input-group-addon');
-</script>
 
-<iframe id="hiddenFrame" style="visibility: hidden" />
+        <!-- Contact Section -->
+        <div class="w3-container w3-padding-32" id="contact">
+            <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Contact</h3>
+            <p>Lets get in touch and talk about your and our next project.</p>
+            <form action="/action_page.php" target="_blank">
+                <input class="w3-input" type="text" placeholder="Name" required name="Name">
+                <input class="w3-input w3-section" type="text" placeholder="Email" required name="Email">
+                <input class="w3-input w3-section" type="text" placeholder="Subject" required name="Subject">
+                <input class="w3-input w3-section" type="text" placeholder="Comment" required name="Comment">
+                <button class="w3-button w3-black w3-section" type="submit">
+                    <i class="fa fa-paper-plane"></i> SEND MESSAGE
+                </button>
+            </form>
+        </div>
+
+        <!-- End page content -->
+    </div>
+
+    <!-- Google Map -->
+    <div id="googleMap" class="w3-grayscale" style="width:100%;height:450px;"></div>
+
+    <!-- Footer -->
+    <footer class="w3-center w3-black w3-padding-16">
+        <p>Powered by
+            <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-text-green">w3.css</a>
+        </p>
+    </footer>
+
+    <!-- Add Google Maps -->
+    <script>
+        function myMap() {
+            myCenter = new google.maps.LatLng(41.878114, -87.629798);
+            var mapOptions = {
+                center: myCenter,
+                zoom: 12, scrollwheel: false, draggable: false,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            var map = new google.maps.Map(document.getElementById("googleMap"), mapOptions);
+
+            var marker = new google.maps.Marker({
+                position: myCenter,
+            });
+            marker.setMap(map);
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBu-916DdpKAjTmJNIgngS6HL_kDIKU0aU&callback=myMap"></script>
+    <!--
+  To use this code on your website, get a free API key from Google.
+  Read more at: https://www.w3schools.com/graphics/google_maps_basic.asp
+  -->
+
+ <!--    <div id="viewerContainer">
+        <div id="firstRow" class="viewerPadding" style="width: 100%; height: 10%"></div>
+        <div id="secondRow" class="viewerPaddingEmpty" style="width: 100%; height: 80%">
+            <div id="firstColumn" class="viewerPadding" style="width: 10%; height: 100%"></div>
+            <div id="forgeViewer" style="position: relative; top: 0px; left: 0px; width: 70%; height: 70% "></div>
+            <div id="thirdColumn" class="viewerPadding" style="width: 10%; height: 100%"></div>
+        </div>
+        <div id="thirdRow" class="viewerPadding" style="width: 100%; height: 10%"></div> 
+        
+            
+    </div> -->
+
+   <!--  <table id="viewerContainer" >
+        <tr class="viewerPadding" width="100%" height="10%">
+                <td class="viewerPadding" width="10%" height="10%">&nbsp;</td>
+                <td class="viewerPadding" width="80%" height="10%">&nbsp;</td>
+                <td class="viewerPadding" width="10%" height="10%">&nbsp;</td>
+        </tr>
+        <tr class="viewerPaddingEmpty" width="100%" height="80%">
+            <td class="viewerPadding" width="10%" height="100%">&nbsp;</td>
+            <td width="80%" height="100%">
+                <div id="forgeViewer" style="position: relative; top: 0px; left: 0px;"></div>
+            </td>
+            <td class="viewerPadding" width="10%" height="100%">&nbsp;</td>
+        </tr>
+        <tr width="100%" height="10%">
+                <td class="viewerPadding" width="10%" height="10%">&nbsp;</td>
+                <td class="viewerPadding" width="80%" height="10%">&nbsp;</td>
+                <td class="viewerPadding" width="10%" height="10%">&nbsp;</td>
+        </tr>
+    </table> -->
+
+    <div id="forgeViewerBackground"></div>
+    <div id="forgeViewer"></div>
 
 </body>
+
 </html>

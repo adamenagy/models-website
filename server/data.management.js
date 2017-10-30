@@ -716,6 +716,97 @@ router.get('/fusionData/:urn/:path', function (req, res) {
     });
 })
 
+function getThumbnail(tokenSession, projectId, versionId) {
+    return new Promise(function (_resolve, _reject) {
+        var versions = new forgeSDK.VersionsApi();
+
+        versions.getVersion(projectId, versionId, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+            .then(function (data) {
+                var url = data.body.data.relationships.thumbnails.meta.link.href;
+                var displayName = data.body.data.attributes.displayName;
+                _resolve({
+                    'thumbnailUrl': url,
+                    'displayName': displayName,
+                    'projectId': projectId,
+                    'versionId': versionId
+                });
+            })
+            .catch(function () {
+                _reject('error');
+            })
+    })
+}
+
+/**
+ * @param  {string} '/designs' 
+ * @param  {request} req 
+ * @param  {result} res
+ */
+router.get('/designs', function (req, res) {
+    var tokenSession = new token(req.session);
+    
+    // 'CustomerProjects'
+    var projectId = 'a.cGVyc29uYWw6dWUyOWM4YjZiIzIwMTcxMDI5MTAxMjA1OTMx';
+    // 'PublicWebsite'
+    var folderId = 'urn:adsk.wipprod:fs.folder:co.z4k5EwwkTQSXbnk93wWC-Q';
+
+    var folders = new forgeSDK.FoldersApi();
+    var versions = new forgeSDK.VersionsApi();
+    folders.getFolderContents(projectId, folderId, {}, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+        .then(function (folderContents) {
+            var data = folderContents.body.data;
+            // var promises = [];
+            var info = [];
+            for (var key in data) {
+                var item = data[key];
+                var displayName = item.attributes.displayName;
+                var versionId = item.relationships.tip.data.id;
+
+                info.push({
+                    'displayName': displayName,
+                    'versionId': versionId
+                })
+                // promises.push(getThumbnail(tokenSession, projectId, versionId));
+            }
+
+            // Promise.all(promises).then(function (data) {
+            //     res.json(data);
+            // })
+            res.json(info);
+        })
+        .catch(function (error) {
+            console.log(error);
+            res.status(error.statusCode).end(error.statusMessage);
+        });
+})
+
+/**
+ * @param  {string} '/designs' 
+ * @param  {request} req 
+ * @param  {result} res
+ */
+router.get('/thumbnails/:versionId64', function (req, res) {
+    var tokenSession = new token(req.session);
+
+    var derivatives = new forgeSDK.DerivativesApi();
+    derivatives.getThumbnail(req.params.versionId64, {}, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+        .then(function (data) {
+            if (data.statusCode === 200) {
+                res.end(data.body); 
+            } else {
+                fs.readFile(__dirname + '/../www/img/NoImageYetMsg.png', function(err, image) {
+                    if (err) {
+                        res.status(500).end('Could not get image');
+                        return;
+                    }
+
+                    res.writeHead(200, {'Content-Type': 'image/png'});
+                    res.end(image); 
+                });
+            }
+        })
+})
+
 /////////////////////////////////////////////////////////////////
 // Return the router object that contains the endpoints
 /////////////////////////////////////////////////////////////////
