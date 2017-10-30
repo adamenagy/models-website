@@ -107,15 +107,6 @@ function get3LegToken(callback) {
     }
 }
 
-function getThumbnail(urn) {
-    console.log("downloadDerivative for urn=" + urn);
-    // fileName = file name you want to use for download
-    var url = window.location.protocol + "//" + window.location.host +
-        "/dm/thumbnail?urn=" + urn;
-
-    window.open(url,'_blank');
-}
-
 /////////////////////////////////////////////////////////////////
 // Viewer
 // Based on Autodesk Viewer basic sample

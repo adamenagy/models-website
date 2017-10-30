@@ -789,7 +789,7 @@ router.get('/thumbnails/:versionId64', function (req, res) {
     var tokenSession = new token(req.session);
 
     var derivatives = new forgeSDK.DerivativesApi();
-    derivatives.getThumbnail(req.params.versionId64, {}, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+    derivatives.getThumbnail(req.params.versionId64, {width: 400, height: 400}, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
         .then(function (data) {
             if (data.statusCode === 200) {
                 res.end(data.body); 
