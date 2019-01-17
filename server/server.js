@@ -17,6 +17,8 @@
 /////////////////////////////////////////////////////////////////////
 'use strict';
 
+console.log('starting server.js');
+
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
@@ -64,5 +66,7 @@ app.use('/', oauth); // redirect oauth API calls
 app.use('/dm', dm); // redirect our Data Management API calls
 app.use('/md', md); // redirect our Data Management API calls
 
+console.log(`using port ${process.env.PORT}`);
+console.log('ending server.js');
 
 module.exports = app;
