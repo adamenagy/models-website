@@ -48,6 +48,8 @@ router.get('/api/forge/clientID', function (req, res) {
   });
 });
 
+
+
 // return the public token of the current user
 // the public token should have a limited scope (read-only)
 router.get('/user/token', function (req, res) {
@@ -79,6 +81,59 @@ router.get('/user/authenticate', function (req, res) {
     '&scope=' + config.scopeInternal.join(" ");
   res.end(url);
 });
+
+function getStoredRefreshToken() {
+  var mongodb = require('mongodb');
+  var mongoClient = mongodb.MongoClient;
+
+  // You could also put the connection URL here, but it's nicer to have it
+  // in an Environment variable - MLAB_URL
+  mongoClient.connect(process.env.MLAB_URL, function(err, db){
+    if (err) {
+      console.log(err);
+      console.log("Failed to connect to MongoDB on mLab");
+      res.status(500).end();
+    } else {
+      mongoClient.db = db; // keep connection
+      console.log("Connected to MongoDB on mLab");
+
+      var query = getIdAndVersion(urn);
+      query.fullPath = path;
+
+      var coll = db.collection("mycollection");
+
+      coll.find(query).toArray(function(err, results) {
+        console.log(results);
+
+        res.json(results);
+      });
+    }
+  });
+}
+
+var _refreshTokenRequests = [];
+function refreshToken(req, res) {
+  if (_refreshTokenRequests.length < 1) {
+    var auth = new forgeSDK.AuthClientThreeLegged(config.credentials.client_id, config.credentials.client_secret, config.callbackURL, config.scopePublic);
+    auth.refreshToken(config.credentials)
+        .then(function (publicCredentials) {
+          tokenSession.setPublicCredentials(publicCredentials);
+          tokenSession.setPublicOAuth(auth);
+
+          console.log('Public token (limited scope): ' + publicCredentials.access_token); // debug
+
+          for (var key in _refreshTokenRequests) {
+            var refreshTokenRequest = _refreshTokenRequests[key];
+            refreshTokenRequest.res.end
+          }
+        })
+        .catch(function (error) {
+          res.end(JSON.stringify(error));
+        });
+  } else {
+    _refreshTokenRequests.push({req: req, res: res});
+  }
+}
 
 // wait for Autodesk callback (oAuth callback)
 router.get('/api/forge/callback/oauth', function (req, res) {
