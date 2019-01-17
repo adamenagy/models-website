@@ -16,7 +16,8 @@
     "oauth": "^0.9.14",
     "request": "^2.88.0",
     "trim": "^0.0.1",
-    "bson": ">=1.0.5"
+    "bson": ">=1.0.5",
+    "cryptiles": "4.1.3"
   },
   "repository": {
     "type": "git",
