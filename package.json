@@ -27,5 +27,8 @@
     "nodemon": "nodemon start.js --ignore www/"
   },
   "author": "Forge Partner Development",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": "9.10.1"
+  }
 }
