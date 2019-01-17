@@ -1,5 +1,5 @@
 {
-  "name": "derivative-service-node.js-sample",
+  "name": "models-website",
   "version": "2.0.0",
   "description": "A sample that shows how to use the Model Derivative API.",
   "dependencies": {
@@ -15,11 +15,12 @@
     "morgan": "^1.9.1",
     "oauth": "^0.9.14",
     "request": "^2.88.0",
-    "trim": "^0.0.1"
+    "trim": "^0.0.1",
+    "bson": ">=1.0.5"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/developer-autodesk/model.derivative-nodejs-sample"
+    "url": "git://github.com/adamenagy/models-website"
   },
   "scripts": {
     "start": "NODE_ENV=production node start.js",
