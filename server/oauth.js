@@ -168,7 +168,7 @@ router.get('/api/forge/callback/oauth', function (req, res) {
 
       // then refresh and get a limited scope token that we can send to the client
       var req2 = new forgeSDK.AuthClientThreeLegged(config.credentials.client_id, config.credentials.client_secret, config.callbackURL, config.scopePublic);
-      req2.refreshToken(internalCredentials)
+      req2.refreshToken(internalCredentials, config.scopePublic)
         .then(function (publicCredentials) {
           tokenSession.setPublicCredentials(publicCredentials);
           tokenSession.setPublicOAuth(req2);
