@@ -27,6 +27,8 @@ var router = express.Router();
 
 var forgeSDK = require('forge-apis');
 
+var globals = {};
+
 // forge config information, such as client ID and secret
 var config = require('./config');
 
@@ -48,13 +50,12 @@ router.get('/api/forge/clientID', function (req, res) {
   });
 });
 
-
-
 // return the public token of the current user
 // the public token should have a limited scope (read-only)
 router.get('/user/token', function (req, res) {
   console.log('Getting user token'); // debug
-  var tokenSession = new token(req.session);
+  //var tokenSession = new token(req.session);
+  var tokenSession = new token(globals);
   // json returns empty object if the entry values are undefined
   // so let's avoid that
   var tp = tokenSession.getPublicCredentials() ? tokenSession.getPublicCredentials().access_token : "";
@@ -82,6 +83,7 @@ router.get('/user/authenticate', function (req, res) {
   res.end(url);
 });
 
+/*
 function getStoredRefreshToken() {
   var mongodb = require('mongodb');
   var mongoClient = mongodb.MongoClient;
@@ -134,6 +136,7 @@ function refreshToken(req, res) {
     _refreshTokenRequests.push({req: req, res: res});
   }
 }
+*/
 
 // wait for Autodesk callback (oAuth callback)
 router.get('/api/forge/callback/oauth', function (req, res) {
@@ -152,7 +155,8 @@ router.get('/api/forge/callback/oauth', function (req, res) {
     res.redirect('/');
   }
 
-  var tokenSession = new token(req.session);
+  //var tokenSession = new token(req.session);
+  var tokenSession = new token(globals);
 
   // first get a full scope token for internal use (server-side)
   var req = new forgeSDK.AuthClientThreeLegged(config.credentials.client_id, config.credentials.client_secret, config.callbackURL, config.scopeInternal);
