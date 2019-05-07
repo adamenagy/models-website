@@ -18,9 +18,10 @@
 
 'use strict'; // http://www.w3schools.com/js/js_strict.asp
 
-function Token(session) {
-    this._session = session;
+var globals = {};
 
+function Token(session) {
+    this._session = globals;//session;
 }
 
 Token.prototype.getInternalOAuth = function () {

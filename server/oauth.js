@@ -27,8 +27,6 @@ var router = express.Router();
 
 var forgeSDK = require('forge-apis');
 
-var globals = {};
-
 // forge config information, such as client ID and secret
 var config = require('./config');
 
@@ -54,8 +52,8 @@ router.get('/api/forge/clientID', function (req, res) {
 // the public token should have a limited scope (read-only)
 router.get('/user/token', function (req, res) {
   console.log('Getting user token'); // debug
-  //var tokenSession = new token(req.session);
-  var tokenSession = new token(globals);
+  var tokenSession = new token(req.session);
+  
   // json returns empty object if the entry values are undefined
   // so let's avoid that
   var tp = tokenSession.getPublicCredentials() ? tokenSession.getPublicCredentials().access_token : "";
@@ -155,8 +153,7 @@ router.get('/api/forge/callback/oauth', function (req, res) {
     res.redirect('/');
   }
 
-  //var tokenSession = new token(req.session);
-  var tokenSession = new token(globals);
+  var tokenSession = new token(req.session);
 
   // first get a full scope token for internal use (server-side)
   var req = new forgeSDK.AuthClientThreeLegged(config.credentials.client_id, config.credentials.client_secret, config.callbackURL, config.scopeInternal);
