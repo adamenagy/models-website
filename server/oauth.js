@@ -59,6 +59,38 @@ router.get('/user/token', function (req, res) {
   var tp = tokenSession.getPublicCredentials() ? tokenSession.getPublicCredentials().access_token : "";
   var te = tokenSession.getPublicCredentials() ? tokenSession.getPublicCredentials().expires_in : "";
   console.log('Public token:' + tp);
+
+  // if the token expired then get a new one
+  // we always set the public one last so that should have the correct refresh_token, that's 
+  // why using session.getPublicCredentials()
+  // to be on the safe side we subtract 5 minutes (300,000 seconds) from the value, so we 
+  // refresh before it's needed
+  if (tp !== "" & new Date(tokenSession.getPublicCredentials().expires_at).getTime() - 3500000 <= Date.now()) {
+    console.log('Need to refresh token'); // debug
+    var req2 = new forgeSDK.AuthClientThreeLegged(config.credentials.client_id, config.credentials.client_secret, config.callbackURL, config.scopePublic);
+    req2.refreshToken(session.getPublicCredentials(), config.scopeInternal)
+      .then(function (internalCredentials) {
+        tokenSession.setInternalCredentials(internalCredentials);
+        tokenSession.setInternalOAuth(req2);
+        console.log('New internal token: ' + internalCredentials.access_token); // debug
+
+        // Also update the refresh token for the public credentials
+        var req3 = new forgeSDK.AuthClientThreeLegged(config.credentials.client_id, config.credentials.client_secret, config.callbackURL, config.scopePublic);
+        req3.refreshToken(internalCredentials, config.scopePublic)
+          .then(function (publicCredentials) {
+            tokenSession.setPublicCredentials(publicCredentials);
+            tokenSession.setPublicOAuth(req3);
+            console.log('New public token (limited scope): ' + publicCredentials.access_token); // debug
+          })
+          .catch(function (error) {
+            res.end(JSON.stringify(error));
+          });
+      })
+      .catch(function (error) {
+        res.end(JSON.stringify(error));
+      });
+  }
+
   res.json({token: tp, expires_in: te});
 });
 
@@ -156,7 +188,7 @@ router.get('/api/forge/callback/oauth', function (req, res) {
   var tokenSession = new token(req.session);
 
   // first get a full scope token for internal use (server-side)
-  var req = new forgeSDK.AuthClientThreeLegged(config.credentials.client_id, config.credentials.client_secret, config.callbackURL, config.scopeInternal);
+  var req = new forgeSDK.AuthClientThreeLegged(config.credentials.client_id, config.credentials.client_secret, config.callbackURL, config.scopeInternal, true);
   console.log(code);
   req.getToken(code)
     .then(function (internalCredentials) {

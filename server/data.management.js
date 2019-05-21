@@ -94,6 +94,8 @@ function getThumbnail(tokenSession, projectId, versionId) {
  * @param  {result} res
  */
 router.get('/designs', function (req, res) {
+    console.log("GET /designs");
+
     var tokenSession = new token(req.session);
     
     // 'CustomerProjects'
@@ -137,6 +139,7 @@ router.get('/designs', function (req, res) {
  * @param  {result} res
  */
 router.get('/thumbnails/:versionId64', function (req, res) {
+    console.log("GET /thumbnails/:versionId64");
     var tokenSession = new token(req.session);
 
     var derivatives = new forgeSDK.DerivativesApi();

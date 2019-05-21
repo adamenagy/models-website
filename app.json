@@ -22,6 +22,6 @@
       "value": "https://<<YOUR HEROKU APP NAME HERE>>.herokuapp.com/api/forge/callback/oauth"
     }
   },
-  "website": "https://developer.autodesk.com/",
+  "website": "https://forge.autodesk.com/",
   "success_url": "/"
 }
