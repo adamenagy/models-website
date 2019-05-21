@@ -65,7 +65,7 @@ router.get('/user/token', function (req, res) {
   // why using session.getPublicCredentials()
   // to be on the safe side we subtract 5 minutes (300,000 seconds) from the value, so we 
   // refresh before it's needed
-  if (tp !== "" & new Date(tokenSession.getPublicCredentials().expires_at).getTime() - 3500000 <= Date.now()) {
+  if (tp !== "" && new Date(tokenSession.getPublicCredentials().expires_at).getTime() - 3500000 <= Date.now()) {
     console.log('Need to refresh token'); // debug
     var req2 = new forgeSDK.AuthClientThreeLegged(config.credentials.client_id, config.credentials.client_secret, config.callbackURL, config.scopePublic);
     req2.refreshToken(session.getPublicCredentials(), config.scopeInternal)
