@@ -68,7 +68,7 @@ router.get('/user/token', function (req, res) {
   if (tp !== "" && new Date(tokenSession.getPublicCredentials().expires_at).getTime() - 3500000 <= Date.now()) {
     console.log('Need to refresh token'); // debug
     var req2 = new forgeSDK.AuthClientThreeLegged(config.credentials.client_id, config.credentials.client_secret, config.callbackURL, config.scopePublic);
-    req2.refreshToken(session.getPublicCredentials(), config.scopeInternal)
+    req2.refreshToken(tokenSession.getPublicCredentials(), config.scopeInternal)
       .then(function (internalCredentials) {
         tokenSession.setInternalCredentials(internalCredentials);
         tokenSession.setInternalOAuth(req2);
