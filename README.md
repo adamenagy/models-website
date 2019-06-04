@@ -3,7 +3,7 @@
 [![Node.js](https://img.shields.io/badge/Node.js-4.4.3-blue.svg)](https://nodejs.org/)
 [![npm](https://img.shields.io/badge/npm-2.15.1-blue.svg)](https://www.npmjs.com/)
 ![Platforms](https://img.shields.io/badge/platform-windows%20%7C%20osx%20%7C%20linux-lightgray.svg)
-[![License](http://img.shields.io/:license-mit-blue.svg)](http://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/badge/license-mit-blue.svg)](http://opensource.org/licenses/MIT)
 
 [![OAuth2](https://img.shields.io/badge/OAuth2-v1-green.svg)](http://developer.autodesk.com/)
 [![OSS](https://img.shields.io/badge/OSS-v2-green.svg)](http://developer.autodesk.com/)
@@ -11,17 +11,21 @@
 
 # Description
 
-This sample shows how you can use the **Model Derivative API** and what you can do with it and also uses [Autodesk Viewer](https://developer.autodesk.com/en/docs/viewer/v2/overview/) for showing models. The front-end will look like:
+This sample shows how you can use the **Data Management API** to access a specific folder from **Fusion Team** (or BIM 360 Docs, A360) and list all the models in it on your website. Then when the user clicks on any of them they will bo shown in the **Forge Viewer**. 
+
+Before others can access the webpage, you need to open it and log into it so that the server from then on will have access to your folder. 
+
+Also, in the **data.management.js** file you need to modify the **projectId** and **folderId** variables so the server app knows which folder's content to show. In order to find that information you can follow the instructions in this blog post: [ID's in the Data Management API](https://forge.autodesk.com/blog/ids-data-management-api)
 
 ![](www/img/indexpage.png)
 
 ## Live version
 
-See it live at [https://derivatives.autodesk.io](https://derivatives.autodesk.io) 
+See it live at [https://fusionmodels.herokuapp.com/](https://fusionmodels.herokuapp.com/) 
 
 ## Setup
 
-In order to use this sample you need Autodesk developer credentials. Visit the [Forge Developer Portal](https://developer.autodesk.com), sign up for an account, then [create an app](https://developer.autodesk.com/myapps/create). For this new app, use <b>http://localhost:3000/api/forge/callback/oauth</b> as Callback URL. Finally take note of the <b>Client ID</b> and <b>Client Secret</b>.
+In order to use this sample you need Autodesk developer credentials. Visit the [Forge Developer Portal](https://forge.autodesk.com), sign up for an account, then [create an app](https://forge.autodesk.com/myapps/create). For this new app, use <b>http://localhost:3000/api/forge/callback/oauth</b> as Callback URL. Finally take note of the <b>Client ID</b> and <b>Client Secret</b>.
 
 
 ### Run locally
@@ -30,7 +34,7 @@ Install [NodeJS](https://nodejs.org).
 
 Clone this project or download it. It's recommended to install [GitHub desktop](https://desktop.github.com/). To clone it via command line, use the following (<b>Terminal</b> on MacOSX/Linux, <b>Git Shell</b> on Windows):
 
-    git clone https://github.com/autodesk-forge/model.derivative-nodejs-sample
+    git clone https://github.com/adamenagy/models-website
 
 To run it, install the required packages, set the enviroment variables with your client ID & secret and finally start it. Via command line, navigate to the folder where this repository was cloned and use the following:
 
@@ -56,7 +60,7 @@ Open the browser: [http://localhost:3000](http://localhost:3000).
 
 To deploy this application to Heroku, the <b>Callback URL</b> & <b>redirect_uri</b> must use your .herokuapp.com address. After clicking on the button below, at the Heroku Create New App page, set your Client ID & Secret and the correct callback URL.
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Autodesk-Forge/model.derivative-nodejs-sample)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/adamenagy/models-website)
 
 ## Packages used
 
