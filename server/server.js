@@ -66,6 +66,13 @@ app.use('/', oauth); // redirect oauth API calls
 app.use('/dm', dm); // redirect our Data Management API calls
 app.use('/md', md); // redirect our Data Management API calls
 
+var request = require('request');
+setInterval(() => {
+    request('https://fusionmodels.herokuapp.com', () => {
+        console.log('Requested site to reset heroku timer');
+    });
+}, 600000);
+
 console.log(`using port ${process.env.PORT}`);
 console.log('ending server.js');
 
