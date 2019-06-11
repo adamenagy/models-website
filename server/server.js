@@ -68,7 +68,7 @@ app.use('/md', md); // redirect our Data Management API calls
 
 var request = require('request');
 setInterval(() => {
-    request('https://fusionmodels.herokuapp.com', () => {
+    request('https://fusionmodels.herokuapp.com/user/token', () => {
         console.log('Requested site to reset heroku timer');
     });
 }, 600000);
