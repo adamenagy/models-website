@@ -66,12 +66,15 @@ app.use('/', oauth); // redirect oauth API calls
 app.use('/dm', dm); // redirect our Data Management API calls
 app.use('/md', md); // redirect our Data Management API calls
 
+/*
+instead of keeping the server running let's stored the refresh token in mLab mongoDB
 var request = require('request');
 setInterval(() => {
     request('https://fusionmodels.herokuapp.com/user/token', () => {
         console.log('Requested site to reset heroku timer');
     });
 }, 600000);
+*/
 
 console.log(`using port ${process.env.PORT}`);
 console.log('ending server.js');

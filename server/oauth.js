@@ -50,15 +50,28 @@ router.get('/api/forge/clientID', function (req, res) {
 
 // return the public token of the current user
 // the public token should have a limited scope (read-only)
-router.get('/user/token', function (req, res) {
+router.get('/user/token', async function (req, res) {
   console.log('Getting user token'); // debug
   var tokenSession = new token(req.session);
   
   // json returns empty object if the entry values are undefined
   // so let's avoid that
   var tp = tokenSession.getPublicCredentials() ? tokenSession.getPublicCredentials().access_token : "";
-  var te = tokenSession.getPublicCredentials() ? tokenSession.getPublicCredentials().expires_in : "";
+  var te = tokenSession.getPublicCredentials() ? tokenSession.getPublicCredentials().expires_in : 0;
   console.log('Public token:' + tp);
+
+  if (tp === "") {
+    let tokens = await getStoredRefreshToken();
+    if (tokens.refresh_token !== "") {
+      tokenSession.setPublicCredentials({ 
+        "access_token": tokens.access_token,
+        "refresh_token": tokens.refresh_token,
+        "expires_at": 0
+      });
+      tp = tokens.access_token;
+      te = 0;
+    }
+  }
 
   // if the token expired then get a new one
   // we always set the public one last so that should have the correct refresh_token, that's 
@@ -80,18 +93,21 @@ router.get('/user/token', function (req, res) {
           .then(function (publicCredentials) {
             tokenSession.setPublicCredentials(publicCredentials);
             tokenSession.setPublicOAuth(req3);
+            setStoredRefreshToken(publicCredentials.access_token, publicCredentials.refresh_token, publicCredentials.expires_at);
             console.log('New public token (limited scope): ' + publicCredentials.access_token); // debug
+            res.json({token: tp, expires_in: te});
           })
           .catch(function (error) {
             res.end(JSON.stringify(error));
           });
       })
       .catch(function (error) {
+        setStoredRefreshToken("", "");
         res.end(JSON.stringify(error));
       });
+  } else {
+    res.json({token: tp, expires_in: te});
   }
-
-  res.json({token: tp, expires_in: te});
 });
 
 // return the forge authenticate url
@@ -113,8 +129,38 @@ router.get('/user/authenticate', function (req, res) {
   res.end(url);
 });
 
-/*
-function getStoredRefreshToken() {
+
+async function getStoredRefreshToken() {
+  return new Promise((resolve, reject) => {
+    var mongodb = require('mongodb');
+    var mongoClient = mongodb.MongoClient;
+  
+    // You could also put the connection URL here, but it's nicer to have it
+    // in an Environment variable - MLAB_URL
+    mongoClient.connect(process.env.MLAB_URL, function(err, db){
+      if (err) {
+        console.log(err);
+        console.log("Failed to connect to MongoDB on mLab");
+        reject(error);
+      } else {
+        mongoClient.db = db; // keep connection
+        console.log("Connected to MongoDB on mLab");
+  
+        var coll = db.collection("tokens");
+  
+        coll.findOne({}, function(err, results) {
+          console.log(results);
+  
+          db.close();
+  
+          resolve(results);
+        });
+      }
+    });
+  });
+}
+
+function setStoredRefreshToken(accessToken, refreshToken, expiresAt) {
   var mongodb = require('mongodb');
   var mongoClient = mongodb.MongoClient;
 
@@ -124,25 +170,23 @@ function getStoredRefreshToken() {
     if (err) {
       console.log(err);
       console.log("Failed to connect to MongoDB on mLab");
-      res.status(500).end();
     } else {
       mongoClient.db = db; // keep connection
       console.log("Connected to MongoDB on mLab");
 
-      var query = getIdAndVersion(urn);
-      query.fullPath = path;
+      var coll = db.collection("tokens");
 
-      var coll = db.collection("mycollection");
-
-      coll.find(query).toArray(function(err, results) {
+      coll.updateOne({}, 
+        { "access_token": accessToken, "refresh_token": refreshToken, "expires_at": expiresAt }, function(err, results) {
         console.log(results);
 
-        res.json(results);
+        db.close();
       });
     }
   });
 }
 
+/*
 var _refreshTokenRequests = [];
 function refreshToken(req, res) {
   if (_refreshTokenRequests.length < 1) {
@@ -204,6 +248,7 @@ router.get('/api/forge/callback/oauth', function (req, res) {
         .then(function (publicCredentials) {
           tokenSession.setPublicCredentials(publicCredentials);
           tokenSession.setPublicOAuth(req2);
+          setStoredRefreshToken(publicCredentials.access_token, publicCredentials.refresh_token, publicCredentials.expires_at);
 
           console.log('Public token (limited scope): ' + publicCredentials.access_token); // debug
           res.redirect('/');
