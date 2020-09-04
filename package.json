@@ -13,7 +13,7 @@
     "express-session": "^1.16.1",
     "forge-apis": "^0.4.5",
     "formidable": "^1.0.17",
-    "mongodb": "^2.2.33",
+    "mongodb": "^3.1.13",
     "morgan": "^1.9.1",
     "oauth": "^0.9.14",
     "request": "^2.88.0",
