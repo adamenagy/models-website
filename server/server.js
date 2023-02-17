@@ -29,6 +29,7 @@ var app = express();
 app.use(cookieParser());
 app.set('trust proxy', 1) // trust first proxy - HTTPS on Heroku
 
+/*
 app.use(session({
     secret: 'autodeskforge',
     cookie: {
@@ -39,8 +40,8 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
+*/
 
-/*
 app.use(cookieSession({
     name: 'session',
     keys: ['autodeskForge'],
@@ -48,7 +49,7 @@ app.use(cookieSession({
     // Cookie Options
     maxAge: 60 * 60 * 1000
 }));
-*/
+
 
 // prepare server routing
 app.use('/', express.static(__dirname + '/../www')); // redirect static calls
