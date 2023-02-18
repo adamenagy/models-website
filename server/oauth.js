@@ -131,59 +131,59 @@ router.get('/user/authenticate', function (req, res) {
 
 
 async function getStoredRefreshToken() {
-  return new Promise((resolve, reject) => {
-    var mongodb = require('mongodb');
-    var mongoClient = mongodb.MongoClient;
+  return new Promise(async (resolve, reject) => {
+    let {MongoClient} = require('mongodb');
+    let mongoClient = new MongoClient(process.env.MLAB_URL)
   
-    // You could also put the connection URL here, but it's nicer to have it
-    // in an Environment variable - MLAB_URL
-    mongoClient.connect(process.env.MLAB_URL, function(err, db){
-      if (err) {
-        console.log(err);
-        console.log("Failed to connect to MongoDB on mLab");
-        reject(error);
-      } else {
-        mongoClient.db = db; // keep connection
-        console.log("Connected to MongoDB on mLab");
-  
-        var coll = db.collection("tokens");
-  
-        coll.findOne({}, function(err, results) {
-          console.log(results);
-  
-          db.close();
-  
-          resolve(results);
-        });
-      }
-    });
+    try {
+      await mongoClient.connect();
+      console.log("Connected to MongoDB on Atlas");
+    } catch (err) {
+      console.log(err);
+      console.log("Failed to connect to MongoDB on Atlas");
+      reject(err);
+      await mongoClient.close();
+    } 
+   
+    try {
+      let db = mongoClient.db("tokens_db");
+      let coll = db.collection("tokens");
+      let item = await coll.findOne({});
+      console.log(item);
+      resolve(item);
+    } catch (err) {
+      console.log(err);
+      reject(err);
+    } finally {
+      await mongoClient.close();
+    }
   });
 }
 
-function setStoredRefreshToken(accessToken, refreshToken, expiresAt) {
-  var mongodb = require('mongodb');
-  var mongoClient = mongodb.MongoClient;
+async function setStoredRefreshToken(accessToken, refreshToken, expiresAt) {
+  let {MongoClient} = require('mongodb');
+  let mongoClient = new MongoClient(process.env.MLAB_URL)
 
-  // You could also put the connection URL here, but it's nicer to have it
-  // in an Environment variable - MLAB_URL
-  mongoClient.connect(process.env.MLAB_URL, function(err, db){
-    if (err) {
-      console.log(err);
-      console.log("Failed to connect to MongoDB on mLab");
-    } else {
-      mongoClient.db = db; // keep connection
-      console.log("Connected to MongoDB on mLab");
-
-      var coll = db.collection("tokens");
-
-      coll.updateOne({}, 
-        { "access_token": accessToken, "refresh_token": refreshToken, "expires_at": expiresAt }, function(err, results) {
-        console.log(results);
-
-        db.close();
-      });
-    }
-  });
+  try {
+    await mongoClient.connect();
+    console.log("Connected to MongoDB on Atlas");
+  } catch (err) {
+    console.log(err);
+    console.log("Failed to connect to MongoDB on Atlas");
+    await mongoClient.close();
+  } 
+ 
+  try {
+    let db = mongoClient.db("tokens_db");
+    let coll = db.collection("tokens");
+    await coll.updateOne({}, 
+      { $set: { "access_token": accessToken, "refresh_token": refreshToken, "expires_at": expiresAt } })
+    console.log("Saved tokens in Atlas");
+  } catch (err) {
+    console.log(err);
+  } finally {
+    await mongoClient.close();
+  }
 }
 
 /*
