@@ -142,11 +142,13 @@ router.get('/thumbnails/:versionId64', function (req, res) {
     console.log("GET /thumbnails/:versionId64");
     var tokenSession = new token(req.session);
 
+    /*
     var derivatives = new forgeSDK.DerivativesApi();
-    derivatives.getThumbnail(req.params.versionId64, {width: 400, height: 400}, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
+    derivatives.getThumbnail (req.params.versionId64, {width: 400, height: 400}, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
         .then(function (data) {
             if (data.statusCode === 200) {
-                res.end(data.body); 
+              let buf = Buffer.from(data.body, 'utf8');
+                res.end(buf); 
             } else {
                 fs.readFile(__dirname + '/../www/img/NoImageYetMsg.png', function(err, image) {
                     if (err) {
@@ -159,6 +161,23 @@ router.get('/thumbnails/:versionId64', function (req, res) {
                 });
             }
         })
+        */
+    let r = require("request");
+    r.get({
+      method: "GET",
+      uri: `https://developer.api.autodesk.com/modelderivative/v2/designdata/${req.params.versionId64}/thumbnail`,
+      encoding: null,
+      headers: {
+        "Authorization": `Bearer ${tokenSession.getInternalCredentials().access_token}` 
+      }
+    }, (err, httpResponse, body) => {
+      if (err) {
+        res.status(500).end('Could not get image');
+        return;
+      }
+      res.writeHead(200, {'Content-Type': 'image/png'});
+      res.end(body); 
+    })
 })
 
 /////////////////////////////////////////////////////////////////
