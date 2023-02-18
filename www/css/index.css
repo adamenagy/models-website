@@ -46,10 +46,11 @@
 
 .viewerPaddingEmmpty {
     position: relative; 
-   
 }
 
-
+.design-image {
+  cursor: pointer;
+}
 
 
 

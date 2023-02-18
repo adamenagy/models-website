@@ -48,7 +48,7 @@ function listDesigns() {
                     content += '<div class="w3-col l3 m6 w3-margin-bottom" onclick=initializeViewer("' + versionId64 + '")>';
                     content += '<div class="w3-display-container">';
                     content += '<div class="w3-display-topleft w3-black w3-padding">' + item.displayName + '</div>';
-                    content += '<img src="/dm/thumbnails/' + versionId64 + '" style="width:100%"></div></div>';
+                    content += '<img class="design-image" src="/dm/thumbnails/' + versionId64 + '" style="width:100%"></div></div>';
                 }
                 content += '</div';
             }
