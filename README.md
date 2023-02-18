@@ -87,7 +87,7 @@ After installing Github desktop for Windows, on the Git Shell, if you see a <b>*
 # License
 
 This sample is licensed under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-Please see the [LICENSE](LICENSE) file for full details.
+Please see the [LICENSE](LICENSE) file for full details. 
 
 ## Written by
 
