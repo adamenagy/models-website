@@ -21,7 +21,7 @@ Also, in the **data.management.js** file you need to modify the **projectId** an
 
 ## Live version
 
-See it live at [https://fusionmodels.herokuapp.com/](https://fusionmodels.herokuapp.com/) 
+See it live at [https://fusionmodels.herokuapp.com/](https://fusionmodels.herokuapp.com/)  
 
 ## Setup
 
