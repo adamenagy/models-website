@@ -21,7 +21,7 @@ var forgeSDK = require('forge-apis');
 // Get the item id and version number from the
 // base64 encoded version id
 function getIdAndVersion(urn64) {
-    var urn = new Buffer(urn64, 'base64').toString("ascii");
+    var urn = Buffer.from(urn64, 'base64').toString("ascii");
     // urn will be something like this:
     // urn:adsk.wipprod:fs.file:vf.dhFQocFPTdy5brBtQVvuCQ?version=1
     urn = urn.replace('urn:adsk.wipprod:fs.file:vf.', '')
@@ -35,36 +35,37 @@ function getIdAndVersion(urn64) {
 
 // Expose an end point through which the client can check if our
 // mongo db contains info about the selected body
-router.get('/fusionData/:urn/:path', function (req, res) {
+router.get('/fusionData/:urn/:path', async function (req, res) {
     var urn = req.params.urn;
     var path = req.params.path;
 
-    var mongodb = require('mongodb');
-    var mongoClient = mongodb.MongoClient;
+    let {MongoClient} = require('mongodb');
+    let mongoClient = new MongoClient(process.env.ATLAS_URL)
 
     // You could also put the connection URL here, but it's nicer to have it
-    // in an Environment variable - MLAB_URL
-    mongoClient.connect(process.env.MLAB_URL, function(err, db){
-        if (err) {
-            console.log(err);
-            console.log("Failed to connect to MongoDB on mLab");
-            res.status(500).end();
-        } else {
-            mongoClient.db = db; // keep connection
-            console.log("Connected to MongoDB on mLab");
+    // in an Environment variable - ATLAS_URL
+    try {
+      await mongoClient.connect();
+      console.log("Connected to MongoDB on Atlas");
+    } catch (err) {
+      console.log(err);
+      console.log("Failed to connect to MongoDB on Atlas");
+      await mongoClient.close();
+    } 
 
-            var query = getIdAndVersion(urn);
-            query.fullPath = path;
-
-            var coll = db.collection("mycollection");
-
-            coll.find(query).toArray(function(err, results) {
-                console.log(results);
-
-                res.json(results);
-            });
-        }
-    });
+    try {
+      let db = mongoClient.db("tokens_db");
+      let coll = db.collection("mycollection");
+      let query = getIdAndVersion(urn);
+      query.fullPath = path;
+      let items = await coll.find(query).toArray();
+      console.log(items);
+      res.json(items);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      await mongoClient.close();
+    }
 })
 
 function getThumbnail(tokenSession, projectId, versionId) {
