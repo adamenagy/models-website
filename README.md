@@ -19,6 +19,9 @@ Also, in the **data.management.js** file you need to modify the **projectId** an
 
 ![](www/img/indexpage.png)
 
+It also includes code that enables you to show data that was "attached" to objects of the model inside **Fusion 360** using the **add-in** talked about in this blog post:
+https://aps.autodesk.com/blog/enrich-fusion-360-data-viewer
+
 ## Live version
 
 See it live at [https://fusionmodels.herokuapp.com/](https://fusionmodels.herokuapp.com/)  
