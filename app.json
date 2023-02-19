@@ -11,13 +11,13 @@
     "template"
   ],
   "env": {
-    "FORGE_CLIENT_ID": {
+    "APS_CLIENT_ID": {
       "description": "Forge Client ID"
     },
-    "FORGE_CLIENT_SECRET": {
+    "APS_CLIENT_SECRET": {
       "description": "Forge Client Secret"
     },
-    "FORGE_CALLBACK_URL": {
+    "APS_CALLBACK_URL": {
       "description": "Callback URL of your app, required for 3-legged OAuth",
       "value": "https://<<YOUR HEROKU APP NAME HERE>>.herokuapp.com/api/forge/callback/oauth"
     }

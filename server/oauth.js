@@ -133,7 +133,7 @@ router.get('/user/authenticate', function (req, res) {
 async function getStoredRefreshToken() {
   return new Promise(async (resolve, reject) => {
     let {MongoClient} = require('mongodb');
-    let mongoClient = new MongoClient(process.env.MLAB_URL)
+    let mongoClient = new MongoClient(process.env.ATLAS_URL)
   
     try {
       await mongoClient.connect();
@@ -162,7 +162,7 @@ async function getStoredRefreshToken() {
 
 async function setStoredRefreshToken(accessToken, refreshToken, expiresAt) {
   let {MongoClient} = require('mongodb');
-  let mongoClient = new MongoClient(process.env.MLAB_URL)
+  let mongoClient = new MongoClient(process.env.ATLAS_URL)
 
   try {
     await mongoClient.connect();
