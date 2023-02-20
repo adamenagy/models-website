@@ -24,7 +24,7 @@ https://aps.autodesk.com/blog/enrich-fusion-360-data-viewer
 
 ## Live version
 
-See it live at [https://fusionmodels.herokuapp.com/](https://fusionmodels.herokuapp.com/)  
+See it live at [https://fusion-models.autodesk.io/](https://fusion-models.autodesk.io/)  
 
 ## Setup
 
