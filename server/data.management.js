@@ -68,27 +68,6 @@ router.get('/fusionData/:urn/:path', async function (req, res) {
     }
 })
 
-function getThumbnail(tokenSession, projectId, versionId) {
-    return new Promise(function (_resolve, _reject) {
-        var versions = new forgeSDK.VersionsApi();
-
-        versions.getVersion(projectId, versionId, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
-            .then(function (data) {
-                var url = data.body.data.relationships.thumbnails.meta.link.href;
-                var displayName = data.body.data.attributes.displayName;
-                _resolve({
-                    'thumbnailUrl': url,
-                    'displayName': displayName,
-                    'projectId': projectId,
-                    'versionId': versionId
-                });
-            })
-            .catch(function () {
-                _reject('error');
-            })
-    })
-}
-
 /**
  * @param  {string} '/designs' 
  * @param  {request} req 
@@ -105,7 +84,6 @@ router.get('/designs', function (req, res) {
     var folderId = 'urn:adsk.wipprod:fs.folder:co.z4k5EwwkTQSXbnk93wWC-Q';
 
     var folders = new forgeSDK.FoldersApi();
-    var versions = new forgeSDK.VersionsApi();
     folders.getFolderContents(projectId, folderId, {}, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
         .then(function (folderContents) {
             var data = folderContents.body.data;
@@ -120,12 +98,8 @@ router.get('/designs', function (req, res) {
                     'displayName': displayName,
                     'versionId': versionId
                 })
-                // promises.push(getThumbnail(tokenSession, projectId, versionId));
             }
 
-            // Promise.all(promises).then(function (data) {
-            //     res.json(data);
-            // })
             res.json(info);
         })
         .catch(function (error) {
@@ -143,26 +117,6 @@ router.get('/thumbnails/:versionId64', function (req, res) {
     console.log("GET /thumbnails/:versionId64");
     var tokenSession = new token(req.session);
 
-    /*
-    var derivatives = new forgeSDK.DerivativesApi();
-    derivatives.getThumbnail (req.params.versionId64, {width: 400, height: 400}, tokenSession.getInternalOAuth(), tokenSession.getInternalCredentials())
-        .then(function (data) {
-            if (data.statusCode === 200) {
-              let buf = Buffer.from(data.body, 'utf8');
-                res.end(buf); 
-            } else {
-                fs.readFile(__dirname + '/../www/img/NoImageYetMsg.png', function(err, image) {
-                    if (err) {
-                        res.status(500).end('Could not get image');
-                        return;
-                    }
-
-                    res.writeHead(200, {'Content-Type': 'image/png'});
-                    res.end(image); 
-                });
-            }
-        })
-        */
     let r = require("request");
     r.get({
       method: "GET",
