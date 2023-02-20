@@ -130,6 +130,7 @@ router.get('/thumbnails/:versionId64', function (req, res) {
         res.status(500).end('Could not get image');
         return;
       }
+      res.set('Cache-control', 'public, max-age=3600')
       res.writeHead(200, {'Content-Type': 'image/png'});
       res.end(body); 
     })
