@@ -31,7 +31,7 @@
   "author": "Forge Partner Development",
   "license": "MIT",
   "engines": {
-    "node": "9.10.1",
-    "npm": "6.4.1"
+    "node": "17.6.0",
+    "npm": "8.5.1"
   }
 }
