@@ -1,15 +1,20 @@
-var MyVars = {
-    keepTrying: true
+//const { MongoTopologyClosedError } = require("mongodb");
+
+var _MyVars = {
+    keepTrying: true,
+    token3Leg: null,
+    viewer: null
 };
 
 $(document).ready(function () {
 
     // 
     $('#forgeViewerBackground').click(function () {
-        var viewer = document.getElementById('forgeViewer')
-        viewer.style.display = 'none';
-        var background = document.getElementById('forgeViewerBackground')
-        background.style.display = 'none';
+      _MyVars.keepTrying = false;
+      var viewer = document.getElementById('forgeViewer')
+      viewer.style.display = 'none';
+      var background = document.getElementById('forgeViewerBackground')
+      background.style.display = 'none';
     })
    
     // Get the tokens
@@ -30,15 +35,6 @@ function listDesigns() {
         success: function (data) {
             var content = '';
 
-            // Fill with new content, something like this:
-            // <div class="w3-row-padding">
-            //     <div class="w3-col l3 m6 w3-margin-bottom">
-            //         <div class="w3-display-container">
-            //             <div class="w3-display-topleft w3-black w3-padding">Summer House</div>
-            //             <img src="/w3images/house5.jpg" alt="House" style="width:100%">
-            //         </div>
-            //     </div>
-            // </div>
             var row_max = Math.ceil(data.length / 4);
             for (var row = 0, count = 0; row < row_max; row++) {
                 content += '<div class="w3-row-padding">';
@@ -95,15 +91,15 @@ function get3LegToken(callback) {
         $.ajax({
             url: '/user/token',
             success: function (data) {
-                MyVars.token3Leg = data.token;
-                console.log('Returning new 3 legged token (User Authorization): ' + MyVars.token3Leg);
+                _MyVars.token3Leg = data.token;
+                console.log('Returning new 3 legged token (User Authorization): ' + _MyVars.token3Leg);
                 callback(data.token, data.expires_in);
             }
         });
     } else {
-        console.log('Returning saved 3 legged token (User Authorization): ' + MyVars.token3Leg);
+        console.log('Returning saved 3 legged token (User Authorization): ' + _MyVars.token3Leg);
 
-        return MyVars.token3Leg;
+        return _MyVars.token3Leg;
     }
 }
 
@@ -115,14 +111,11 @@ function get3LegToken(callback) {
 
 function cleanupViewer() {
     // Clean up previous instance
-    if (MyVars.viewer && MyVars.viewer.model) {
+    if (_MyVars.viewer && _MyVars.viewer.model) {
         console.log("Unloading current model from Autodesk Viewer");
 
-        //MyVars.viewer.impl.unloadModel(MyVars.viewer.model);
-        //MyVars.viewer.activeModel = null;
-        //MyVars.viewer.impl.sceneUpdated(true);
-        MyVars.viewer.tearDown();
-        MyVars.viewer.setUp(MyVars.viewer.config);
+        _MyVars.viewer.tearDown();
+        _MyVars.viewer.setUp(_MyVars.viewer.config);
     }
 }
 
@@ -138,24 +131,25 @@ function initializeViewer(urn) {
 
     var options = {
         document: 'urn:' + urn,
-        env: 'AutodeskProduction',
+        env: 'AutodeskProduction2',
+        api: 'streamingV2',
         getAccessToken: get3LegToken // this works fine, but if I pass get3LegToken it only works the first time
     };
 
-    if (MyVars.viewer) {
-        loadDocument(MyVars.viewer, options.document);
+    if (_MyVars.viewer) {
+        loadDocument(_MyVars.viewer, options.document);
     } else {
         var viewerElement = document.getElementById('forgeViewer');
         var config = {
             // extensions: ['Autodesk.Viewing.webVR', 'Autodesk.Viewing.MarkupsGui'],
             // experimental: ['webVR_orbitModel']
         };
-        MyVars.viewer = new Autodesk.Viewing.Private.GuiViewer3D(viewerElement, config);
+        _MyVars.viewer = new Autodesk.Viewing.GuiViewer3D(viewerElement, config);
         Autodesk.Viewing.Initializer(
             options,
             function () {
-                MyVars.viewer.start(); // this would be needed if we also want to load extensions
-                loadDocument(MyVars.viewer, options.document);
+                _MyVars.viewer.start(); // this would be needed if we also want to load extensions
+                loadDocument(_MyVars.viewer, options.document);
             }
         );
     }
@@ -225,37 +219,80 @@ function addFusionButton(viewer) {
     viewer.toolbar.addControl(subToolbar);
 }
 
-function loadDocument(viewer, documentId) {
+async function loadDocument(viewer, documentId) {
+  const tryLoading = () => {
+    return new Promise((resolve, reject) => {
+      Autodesk.Viewing.Document.load(
+          documentId,
+          // onLoad
+          function (doc) {
+              var geometryItems = [];
+              // Try 3d geometry first
+              geometryItems = doc.getRoot().search({
+                  'type': 'geometry',
+                  'role': '3d'
+              });
 
-    Autodesk.Viewing.Document.load(
-        documentId,
-        // onLoad
-        function (doc) {
-            var geometryItems = [];
-            // Try 3d geometry first
-            geometryItems = Autodesk.Viewing.Document.getSubItemsWithProperties(doc.getRootItem(), {
-                'type': 'geometry',
-                'role': '3d'
-            }, true);
+              // If no 3d then try 2d
+              if (geometryItems.length < 1)
+                  geometryItems = doc.getRoot().search({
+                      'type': 'geometry',
+                      'role': '2d'
+                  });
 
-            // If no 3d then try 2d
-            if (geometryItems.length < 1)
-                geometryItems = Autodesk.Viewing.Document.getSubItemsWithProperties(doc.getRootItem(), {
-                    'type': 'geometry',
-                    'role': '2d'
-                }, true);
+              if (geometryItems.length > 0) {
+                  var item = geometryItems[0];
+                  //viewer.load(doc.getViewablePath(geometryItems[0]), null, null, null, doc.acmSessionId /*session for DM*/);
+                  var options = {};
+                  let url = doc.getViewableUrn(item, options);
+                  if (!url) {
+                    reject(Autodesk.Viewing.ErrorCodes.BAD_DATA_NO_VIEWABLE_CONTENT);
+                    return;
+                  }
 
-            if (geometryItems.length > 0) {
-                var path = doc.getViewablePath(geometryItems[0]);
-                //viewer.load(doc.getViewablePath(geometryItems[0]), null, null, null, doc.acmSessionId /*session for DM*/);
-                var options = {};
-                viewer.loadModel(path, options);
-                addFusionButton(viewer);
-            }
-        },
-        // onError
-        function (errorMsg) {
-            //showThumbnail(documentId.substr(4, documentId.length - 1));
-        }
-    )
+                  viewer.loadDocumentNode(doc, item, options).then(() => {
+                    addFusionButton(viewer);
+                  })
+              }
+          },
+          // onError
+          function (code, errorMsg, more) {
+              //showThumbnail(documentId.substr(4, documentId.length - 1));
+              reject(code);
+          }
+      )
+    })
+  };
+
+  _MyVars.keepTrying = true;
+  let startedTranslation = false;
+  while (_MyVars.keepTrying) {
+    try {
+      await tryLoading();
+      return;
+    } catch (error) {
+      if (
+        error !== Autodesk.Viewing.ErrorCodes.NETWORK_FILE_NOT_FOUND && 
+        error !== Autodesk.Viewing.ErrorCodes.BAD_DATA_NO_VIEWABLE_CONTENT &&
+        error !== undefined
+      ) 
+        return;
+
+      if (!startedTranslation) {
+        $.ajax({
+          url: '/md/export',
+          type: 'POST',
+          data: JSON.stringify({
+            format: "svf",
+            urn: documentId.replace("urn:", "")
+          }),
+          contentType: "application/json; charset=utf-8",
+          dataType: "json"
+        });
+        startedTranslation = true;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
 }

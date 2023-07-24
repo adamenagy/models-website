@@ -22,25 +22,11 @@ console.log('starting server.js');
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
-var session = require('express-session');
 var app = express();
 
 // this session will be used to save the oAuth token
 app.use(cookieParser());
 app.set('trust proxy', 1) // trust first proxy - HTTPS on Heroku
-
-/*
-app.use(session({
-    secret: 'autodeskforge',
-    cookie: {
-        httpOnly: true,
-        secure: (process.env.NODE_ENV === 'production'),
-        maxAge: 1000 * 60 * 60 // 1 hours to expire the session and avoid memory leak
-    },
-    resave: false,
-    saveUninitialized: true
-}));
-*/
 
 app.use(cookieSession({
     name: 'session',
@@ -66,16 +52,6 @@ var md = require('./model.derivative');
 app.use('/', oauth); // redirect oauth API calls
 app.use('/dm', dm); // redirect our Data Management API calls
 app.use('/md', md); // redirect our Data Management API calls
-
-/*
-instead of keeping the server running let's stored the refresh token in mLab mongoDB
-var request = require('request');
-setInterval(() => {
-    request('https://fusionmodels.herokuapp.com/user/token', () => {
-        console.log('Requested site to reset heroku timer');
-    });
-}, 600000);
-*/
 
 console.log(`using port ${process.env.PORT}`);
 console.log('ending server.js');
