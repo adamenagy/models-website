@@ -121,7 +121,7 @@ router.get('/user/authenticate', function (req, res) {
   // redirect the user to this page
   var url =
     "https://developer.api.autodesk.com" +
-    '/authentication/v1/authorize?response_type=code' +
+    '/authentication/v2/authorize?response_type=code' +
     '&client_id=' + config.credentials.client_id +
     '&redirect_uri=' + config.callbackURL +
     '&state=' + req.session.csrf +
